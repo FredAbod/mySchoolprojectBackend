@@ -8,7 +8,26 @@ import ttsRoutes from "./modules/tts/tts.route";
 
 const app = express();
 
-app.use(cors());
+const allowList = (process.env.CORS_ORIGINS ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const corsOptions: cors.CorsOptions = {
+  origin(origin, callback) {
+    // Allow server-to-server (no Origin) and allowlist matches.
+    if (!origin) return callback(null, true);
+    if (allowList.length === 0) return callback(null, true);
+    return callback(null, allowList.includes(origin));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400,
+};
+
+app.use(cors(corsOptions));
+// Express 5 + path-to-regexp v6 doesn't accept "*" here; use a regex to match all.
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/attempts", attemptRoutes);
