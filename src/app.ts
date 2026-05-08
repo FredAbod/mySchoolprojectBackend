@@ -1,10 +1,13 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import attemptRoutes from "./modules/attempt/attempt.route";
 import userRoutes from "./modules/user/user.route";
 import lessonsRoutes from "./modules/lessons/lessons.route";
 import campaignRoutes from "./modules/campaign/campaign.route";
 import ttsRoutes from "./modules/tts/tts.route";
+import authRoutes from "./modules/auth/auth.route";
+import adminRoutes from "./modules/admin/admin.route";
 
 const app = express();
 
@@ -29,11 +32,14 @@ app.use(cors(corsOptions));
 // Express 5 + path-to-regexp v6 doesn't accept "*" here; use a regex to match all.
 app.options(/.*/, cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/attempts", attemptRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/lessons", lessonsRoutes);
 app.use("/api/campaign", campaignRoutes);
 app.use("/api/tts", ttsRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 export default app;
